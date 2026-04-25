@@ -1,4 +1,4 @@
-# Menu Image Downloader
+# ImageDownloader
 
 A browser-based tool for restaurant and food business teams to search menu item names, select high-quality stock food images, and download them with clean filenames.
 
@@ -16,7 +16,7 @@ A browser-based tool for restaurant and food business teams to search menu item 
 ## Files
 
 ```text
-menu-image-downloader/
+ImageDownloader/
 ├── index.html
 ├── styles.css
 ├── app.js
@@ -34,17 +34,6 @@ menu-image-downloader/
 6. Save settings.
 7. Paste menu items and click Search All Images.
 
-## GitHub Pages deployment
-
-1. Create a GitHub repository named `menu-image-downloader`.
-2. Upload these files to the root of the repo.
-3. Go to Settings > Pages.
-4. Select the `main` branch and `/ (root)`.
-5. GitHub will publish the app at:
-
-```text
-https://YOUR-USERNAME.github.io/menu-image-downloader
-```
 
 ## Notes
 

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Menu Image Downloader</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">🍽️</div>
+        <div>
+          <h1>Menu Image Downloader</h1>
+          <p class="subtitle">Search menu items, pick the best food photos, and download cleanly named files.</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button class="btn btn-light" id="settingsBtn">⚙ Settings</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel controls">
+        <div>
+          <label for="menuItems">Paste menu items, one per line</label>
+          <textarea id="menuItems" placeholder="Butter Chicken&#10;Caesar Salad&#10;Mango Lassi"></textarea>
+        </div>
+
+        <div class="side-controls">
+          <div>
+            <label for="orientation">Image orientation</label>
+            <select id="orientation">
+              <option value="landscape">Landscape</option>
+              <option value="portrait">Portrait</option>
+              <option value="square">Square</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="resultsPerItem">Results per item</label>
+            <select id="resultsPerItem">
+              <option value="3" selected>Top 3</option>
+              <option value="6">Top 6</option>
+              <option value="9">Top 9</option>
+            </select>
+          </div>
+
+          <div class="button-row">
+            <button class="btn btn-primary" id="searchBtn">🔍 Search All Images</button>
+            <button class="btn btn-secondary" id="downloadZipBtn" disabled>↓ Download All as ZIP</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel status-bar">
+        <div class="status-text" id="statusText"><strong>Ready.</strong> Add menu items and search.</div>
+        <div id="progressText">0 items loaded</div>
+      </section>
+
+      <section class="results" id="results">
+        <div class="panel empty-state">
+          <div class="big">🥘</div>
+          <strong>No images yet.</strong>
+          <p>Search a few menu items to preview selectable image cards here.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="settingsDialog">
+    <form class="modal" method="dialog">
+      <div class="modal-head">
+        <div>
+          <h2>API Settings</h2>
+          <p>Keys are saved only in this browser using localStorage. They are never added to your GitHub repo.</p>
+        </div>
+        <button class="btn btn-light" value="cancel" aria-label="Close settings">✕</button>
+      </div>
+
+      <div class="settings-grid">
+        <div>
+          <label for="pexelsKey">Pexels API Key</label>
+          <input id="pexelsKey" type="password" placeholder="Paste Pexels key" autocomplete="off" />
+          <p>Primary source. Get a free key from <a href="https://www.pexels.com/api/" target="_blank" rel="noopener">Pexels API</a>.</p>
+        </div>
+
+        <div>
+          <label for="unsplashKey">Unsplash Access Key</label>
+          <input id="unsplashKey" type="password" placeholder="Paste Unsplash access key" autocomplete="off" />
+          <p>Fallback source. Get a free key from <a href="https://unsplash.com/developers" target="_blank" rel="noopener">Unsplash Developers</a>.</p>
+        </div>
+      </div>
+
+      <div class="settings-actions">
+        <button class="btn btn-danger" type="button" id="clearKeysBtn">Clear Keys</button>
+        <div class="settings-right-actions">
+          <button class="btn btn-light" value="cancel">Cancel</button>
+          <button class="btn btn-primary" type="button" id="saveKeysBtn">Save Settings</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast"></div>
+</body>
+</html>

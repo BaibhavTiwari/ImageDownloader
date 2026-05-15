@@ -143,10 +143,11 @@ async function searchItem(item) {
   const unsplashKey = getUnsplashKey();
   const count = Number(els.resultsPerItem.value || 3);
   const orientation = els.orientation.value;
+  const foodQuery = `${item} food dish`;
 
   if (pexelsKey) {
     try {
-      const pexelsResults = await searchPexels(item, count, orientation, pexelsKey);
+      const pexelsResults = await searchPexels(foodQuery, item, count, orientation, pexelsKey);
       if (pexelsResults.length) return pexelsResults;
     } catch (error) {
       console.warn('Pexels failed:', error);
@@ -154,14 +155,14 @@ async function searchItem(item) {
   }
 
   if (unsplashKey) {
-    const unsplashResults = await searchUnsplash(item, count, orientation, unsplashKey);
+    const unsplashResults = await searchUnsplash(foodQuery, item, count, orientation, unsplashKey);
     if (unsplashResults.length) return unsplashResults;
   }
 
   return [];
 }
 
-async function searchPexels(query, count, orientation, apiKey) {
+async function searchPexels(query, displayName, count, orientation, apiKey) {
   const url = new URL('https://api.pexels.com/v1/search');
   url.searchParams.set('query', query);
   url.searchParams.set('per_page', count);
@@ -178,7 +179,7 @@ async function searchPexels(query, count, orientation, apiKey) {
   return (data.photos || []).map(photo => ({
     id: `pexels-${photo.id}`,
     source: 'Pexels',
-    itemName: query,
+    itemName: displayName,
     thumbUrl: photo.src.large,
     downloadUrl: photo.src.original,
     pageUrl: photo.url,
@@ -189,12 +190,13 @@ async function searchPexels(query, count, orientation, apiKey) {
   }));
 }
 
-async function searchUnsplash(query, count, orientation, apiKey) {
+async function searchUnsplash(query, displayName, count, orientation, apiKey) {
   const url = new URL('https://api.unsplash.com/search/photos');
   url.searchParams.set('query', query);
   url.searchParams.set('per_page', count);
   url.searchParams.set('orientation', orientation);
   url.searchParams.set('content_filter', 'high');
+  url.searchParams.set('collections', '3694365,1118894');
 
   const response = await fetch(url, {
     headers: { Authorization: `Client-ID ${apiKey}` },
@@ -207,7 +209,7 @@ async function searchUnsplash(query, count, orientation, apiKey) {
   return (data.results || []).map(photo => ({
     id: `unsplash-${photo.id}`,
     source: 'Unsplash',
-    itemName: query,
+    itemName: displayName,
     thumbUrl: photo.urls.regular,
     downloadUrl: photo.urls.full,
     pageUrl: `${photo.links.html}?utm_source=menu_image_downloader&utm_medium=referral`,
@@ -367,8 +369,13 @@ async function fetchImageBlob(url) {
 
 function buildFilename(itemName, ext) {
   const safeName = itemName
-    .replace(/[\\/:*?"<>|]/g, '')
-    .replace(/\s+/g, ' ')
+    .normalize('NFD')                          // decompose accented chars (é → e + ́)
+    .replace(/[\u0300-\u036f]/g, '')           // strip accent marks
+    .replace(/[\\/:*?"<>|#%&{}$!'@`=+]/g, '') // strip filesystem-unsafe & URL-unsafe symbols
+    .replace(/\.{2,}/g, '.')                   // collapse multiple dots to one
+    .replace(/\s+/g, '_')                      // spaces → underscores
+    .replace(/_{2,}/g, '_')                    // collapse multiple underscores
+    .replace(/^[_.\-]+|[_.\-]+$/g, '')         // strip leading/trailing _ . -
     .trim() || 'menu-item';
 
   return `${safeName}.${ext || 'jpg'}`;

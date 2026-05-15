@@ -368,14 +368,10 @@ async function fetchImageBlob(url) {
 }
 
 function buildFilename(itemName, ext) {
+  // Only strip characters that are hard-forbidden by OS filesystems (Windows + Unix).
+  // Everything else — spaces, accents, symbols, integers — stays exactly as typed.
   const safeName = itemName
-    .normalize('NFD')                          // decompose accented chars (é → e + ́)
-    .replace(/[\u0300-\u036f]/g, '')           // strip accent marks
-    .replace(/[\\/:*?"<>|#%&{}$!'@`=+]/g, '') // strip filesystem-unsafe & URL-unsafe symbols
-    .replace(/\.{2,}/g, '.')                   // collapse multiple dots to one
-    .replace(/\s+/g, '_')                      // spaces → underscores
-    .replace(/_{2,}/g, '_')                    // collapse multiple underscores
-    .replace(/^[_.\-]+|[_.\-]+$/g, '')         // strip leading/trailing _ . -
+    .replace(/[\\/:*?"<>|]/g, '')  // OS-forbidden chars only
     .trim() || 'menu-item';
 
   return `${safeName}.${ext || 'jpg'}`;
